@@ -1,6 +1,6 @@
 class Tweet 
 
-    attr_accessor :content, :author, :id
+    attr_accessor :content, :author_id, :id
 
     def initialize(attr_hash={})
         #is NOT responsible for sending attributes to the db
@@ -11,7 +11,7 @@ class Tweet
             end
             #self.content=(value)
         end
-        #{content: Faker::Quote.matz, author: 'Matz'}
+        #{content: Faker::Quote.matz, author_id: 'Matz'}
     end
 
     def self.all
@@ -36,17 +36,17 @@ class Tweet
              # if it is already saved, update it 
              sql = <<-SQL 
                 UPDATE tweets
-                SET content = ?, author = ?
+                SET content = ?, author_id = ?
                 WHERE id = ?;
              SQL
-             DB[:conn].execute(sql, self.content, self.author, self.id)
+             DB[:conn].execute(sql, self.content, self.author_id, self.id)
         else
             # if it is not already saved, add to db
             sql = <<-SQL 
-                INSERT INTO tweets (content, author) 
+                INSERT INTO tweets (content, author_id) 
                 VALUES (?,?)
             SQL
-            DB[:conn].execute(sql, @content, self.author)
+            DB[:conn].execute(sql, @content, self.author_id)
             @id = DB[:conn].last_insert_row_id
         end
         self
@@ -58,10 +58,22 @@ class Tweet
             CREATE TABLE IF NOT EXISTS tweets (
                 id INTEGER PRIMARY KEY,
                 content TEXT,
-                author TEXT
+                author_id INTEGER
             )
         SQL
 
         DB[:conn].execute(sql)
     end
+
+    # belongs_to :author
+
+    def author
+        Author.find(self.author_id)
+    end
+
+    def author=(author)
+        self.author_id = author.id
+        author
+    end
+
 end
