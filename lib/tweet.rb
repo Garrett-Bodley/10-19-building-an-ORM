@@ -15,10 +15,10 @@ class Tweet
     end
 
     def self.all
-       array_of_hashes = DB[:conn].execute("SELECT * FROM tweets")
-       array_of_hashes.collect do |hash|
-         self.new(hash)
-       end
+        array_of_hashes = DB[:conn].execute("SELECT * FROM tweets")
+        array_of_hashes.collect do |hash|
+            self.new(hash)
+        end
     end
 
     def self.find(id)
@@ -31,15 +31,15 @@ class Tweet
     def save 
         # add the attr_accessor data to the db
 
-       
+        
         if !!self.id  
-             # if it is already saved, update it 
-             sql = <<-SQL 
+            # if it is already saved, update it 
+            sql = <<-SQL 
                 UPDATE tweets
                 SET content = ?, author_id = ?
                 WHERE id = ?;
-             SQL
-             DB[:conn].execute(sql, self.content, self.author_id, self.id)
+            SQL
+            DB[:conn].execute(sql, self.content, self.author_id, self.id)
         else
             # if it is not already saved, add to db
             sql = <<-SQL 
@@ -74,6 +74,10 @@ class Tweet
     def author=(author)
         self.author_id = author.id
         author
+    end
+
+    def self.create(hash)
+        self.new(hash).save
     end
 
 end

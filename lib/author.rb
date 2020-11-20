@@ -59,4 +59,33 @@ class Author
     DB[:conn].execute(sql)
   end
 
+  #has_many :tweets
+
+  def tweets
+    sql = "SELECT * from tweets WHERE tweets.author_id = ?"
+    DB[:conn].execute(sql, self.id).map do |tweet|
+      Tweet.new(tweet)
+    end
+
+    #Tweet.all.select do |tweet|
+    #  tweet.author_id == self.id
+    #end
+  end
+
+  def tweet_ids
+    self.tweets.map do |tweet|
+      tweet.id
+    end
+  end
+  def tweet_ids=(array)
+    array.each do |id|
+      t = Tweet.find(id)
+      t.author_id = self.id
+      t.save
+    end
+  end
+
+  def self.create(hash)
+    self.new(hash).save
+  end
 end
